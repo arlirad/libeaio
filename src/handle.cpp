@@ -16,8 +16,16 @@ namespace eaio {
 
     handle::~handle() {}
 
+    coro<io_result> handle::read(char* buffer, size_t count) {
+        co_return co_await wait(this->_shared->in_done, ::read, this->_fd, buffer, count);
+    }
+
     coro<io_result> handle::read(void* buffer, size_t count) {
         co_return co_await wait(this->_shared->in_done, ::read, this->_fd, buffer, count);
+    }
+
+    coro<io_result> handle::write(const char* buffer, size_t count) {
+        co_return co_await wait(this->_shared->in_done, ::write, this->_fd, buffer, count);
     }
 
     coro<io_result> handle::write(const void* buffer, size_t count) {

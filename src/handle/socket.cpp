@@ -9,8 +9,16 @@ namespace eaio {
         return std::format("{}: {}.", prefix, strerror(this->error));
     }
 
-    coro<io_result> socket::send(void* buffer, size_t count) {
+    coro<io_result> socket::send(const char* buffer, size_t count) {
         co_return co_await wait(this->_shared->in_done, ::send, this->_fd, buffer, count, 0);
+    }
+
+    coro<io_result> socket::send(const void* buffer, size_t count) {
+        co_return co_await wait(this->_shared->in_done, ::send, this->_fd, buffer, count, 0);
+    }
+
+    coro<io_result> socket::recv(char* buffer, size_t count) {
+        co_return co_await wait(this->_shared->in_done, ::recv, this->_fd, buffer, count, 0);
     }
 
     coro<io_result> socket::recv(void* buffer, size_t count) {

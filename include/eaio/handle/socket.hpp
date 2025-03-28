@@ -14,7 +14,9 @@ namespace eaio {
         io_result read()  = delete;
         io_result write() = delete;
 
-        coro<io_result> send(void* buffer, size_t count);
+        coro<io_result> send(const char* buffer, size_t count);
+        coro<io_result> send(const void* buffer, size_t count);
+        coro<io_result> recv(char* buffer, size_t count);
         coro<io_result> recv(void* buffer, size_t count);
 
         io_result           listen(int backlog);

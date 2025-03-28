@@ -33,7 +33,9 @@ namespace eaio {
             return this->_fd != -1;
         }
 
+        coro<io_result> read(char* buffer, size_t count);
         coro<io_result> read(void* buffer, size_t count);
+        coro<io_result> write(const char* buffer, size_t count);
         coro<io_result> write(const void* buffer, size_t count);
 
         protected:
