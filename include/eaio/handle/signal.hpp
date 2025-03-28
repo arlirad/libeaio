@@ -24,6 +24,8 @@ namespace eaio {
         signalfd_siginfo info;
         error_t          error;
 
+        std::string perror(const char* prefix);
+
         operator signalfd_siginfo() {
             return info;
         }

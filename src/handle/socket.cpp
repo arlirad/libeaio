@@ -1,7 +1,14 @@
 #include "eaio.hpp"
 #include "io.hpp"
 
+#include <format>
+#include <string.h>
+
 namespace eaio {
+    std::string accept_result::perror(const char* prefix) {
+        return std::format("{}: {}.", prefix, strerror(this->error));
+    }
+
     coro<io_result> socket::send(void* buffer, size_t count) {
         co_return co_await wait(this->_shared->in_done, ::send, this->_fd, buffer, count, 0);
     }
@@ -17,11 +24,11 @@ namespace eaio {
     coro<accept_result> socket::accept() {
         auto result = co_await wait(this->_shared->in_done, ::accept, this->_fd, nullptr, nullptr);
 
-        if (!result)
+        if (!result) {
             co_return accept_result{
                 .error = errno,
             };
-
+        }
 
         co_return accept_result{
             this->_shared->_owner.wrap<socket>(std::move(result.value)),

@@ -43,6 +43,8 @@ namespace eaio {
         socket  returned_handle;
         error_t error;
 
+        std::string perror(const char* prefix);
+
         operator socket() {
             return returned_handle;
         }

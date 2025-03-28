@@ -4,6 +4,7 @@
 
 #include <errno.h>
 #include <memory>
+#include <string>
 
 namespace eaio {
     class dispatcher;
@@ -15,6 +16,8 @@ namespace eaio {
             ssize_t value;
         };
         error_t error;
+
+        std::string perror(const char* prefix);
 
         operator bool() {
             return len >= 0;

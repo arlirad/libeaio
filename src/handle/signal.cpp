@@ -1,7 +1,14 @@
 #include "eaio.hpp"
 #include "io.hpp"
 
+#include <format>
+#include <string.h>
+
 namespace eaio {
+    std::string get_result::perror(const char* prefix) {
+        return std::format("{}: {}.", prefix, strerror(this->error));
+    }
+
     coro<get_result> signal::get() {
         signalfd_siginfo info;
 

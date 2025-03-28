@@ -1,9 +1,15 @@
 #include "eaio.hpp"
 #include "io.hpp"
 
+#include <format>
+#include <string.h>
 #include <unistd.h>
 
 namespace eaio {
+    std::string io_result::perror(const char* prefix) {
+        return std::format("{}: {}.", prefix, strerror(this->error));
+    }
+
     handle::handle() {}
     handle::handle(int fd, dispatcher& o)
         : _fd(fd), _shared(std::make_shared<handle::shared>(fd, o)) {}
