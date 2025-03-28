@@ -1,15 +1,12 @@
 #pragma once
 
-#include "eaio/coro.hpp"
-#include "eaio/handle.hpp"
+#include <eaio/coro.hpp>
+#include <eaio/handle.hpp>
 #include <sys/epoll.h>
 
 #include <vector>
 
 namespace eaio {
-
-    struct background;
-
     class dispatcher {
         public:
         static const int MAX_EVENTS = 32;

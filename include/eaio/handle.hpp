@@ -1,7 +1,7 @@
 #pragma once
 
-#include "eaio/coro.hpp"
-#include "eaio/handle.hpp"
+#include <eaio/coro.hpp>
+#include <eaio/handle.hpp>
 #include <sys/socket.h>
 #include <sys/types.h>
 
@@ -21,10 +21,6 @@ namespace eaio {
 
         operator bool() {
             return len >= 0;
-        }
-
-        operator ssize_t() {
-            return value;
         }
     };
 
