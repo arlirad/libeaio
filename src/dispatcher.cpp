@@ -19,8 +19,6 @@ namespace eaio {
         ev.data.fd  = h->_fd;
         ev.data.ptr = reinterpret_cast<void*>(h);
 
-        printf("adding %i with %p\n", h->_fd, h);
-
         epoll_ctl(this->_fd, EPOLL_CTL_ADD, h->_fd, &ev);
     }
 
@@ -30,8 +28,6 @@ namespace eaio {
         ev.events   = EPOLLIN;
         ev.data.fd  = fd;
         ev.data.ptr = nullptr;
-
-        printf("removing %i\n", fd);
 
         // Before Linux 2.6.9, the EPOLL_CTL_DEL operation required a non-
         // null pointer in event, even though this argument is ignored.
@@ -54,9 +50,8 @@ namespace eaio {
         this->_to_cleanup.clear();
     }
 
-    handle dispatcher::wrap(int fd) {
+    void dispatcher::prepare_fd(int fd) {
         fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
-        return handle(fd, *this);
     }
 
     void dispatcher::resume(dispatcher::event_slot& rv, handle::shared* h) {

@@ -2,6 +2,7 @@
 
 #include <eaio/coro.hpp>
 #include <eaio/handle.hpp>
+#include <eaio/handle/socket.hpp>
 #include <sys/epoll.h>
 
 #include <vector>
@@ -22,8 +23,13 @@ namespace eaio {
             call_def(f, args...);
         }
 
-        handle wrap(int fd);
-        void   poll();
+        template <typename T>
+        T wrap(int fd) {
+            this->prepare_fd(fd);
+            return T(fd, *this);
+        }
+
+        void poll();
 
         private:
         using event_slot = epoll_event;
@@ -42,5 +48,6 @@ namespace eaio {
         }
 
         void resume(event_slot& ev, handle::shared* h);
+        void prepare_fd(int fd);
     };
 }
