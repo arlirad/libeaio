@@ -1,0 +1,69 @@
+#include "eaio.hpp"
+
+#include <fcntl.h>
+#include <unistd.h>
+
+namespace eaio {
+    dispatcher::dispatcher() {
+        this->_fd = epoll_create1(0);
+    }
+
+    dispatcher::~dispatcher() {
+        close(this->_fd);
+    }
+
+    void dispatcher::add(int fd, handle::shared* h) {
+        epoll_event ev;
+
+        ev.events   = EPOLLIN;
+        ev.data.fd  = h->_fd;
+        ev.data.ptr = reinterpret_cast<void*>(h);
+
+        printf("adding %i with %p\n", h->_fd, h);
+
+        epoll_ctl(this->_fd, EPOLL_CTL_ADD, h->_fd, &ev);
+    }
+
+    void dispatcher::remove(int fd) {
+        epoll_event ev;
+
+        ev.events   = EPOLLIN;
+        ev.data.fd  = fd;
+        ev.data.ptr = nullptr;
+
+        printf("removing %i\n", fd);
+
+        // Before Linux 2.6.9, the EPOLL_CTL_DEL operation required a non-
+        // null pointer in event, even though this argument is ignored.
+        epoll_ctl(this->_fd, EPOLL_CTL_DEL, fd, &ev);
+    }
+
+    void dispatcher::poll() {
+        int nfds = epoll_wait(this->_fd, this->_events, this->MAX_EVENTS, -1);
+
+        for (int i = 0; i < nfds; i++) {
+            epoll_event& event = this->_events[i];
+            auto         sh    = reinterpret_cast<handle::shared*>(event.data.ptr);
+
+            this->resume(event, sh);
+        }
+
+        for (auto handle : this->_to_cleanup)
+            handle.destroy();
+
+        this->_to_cleanup.clear();
+    }
+
+    handle dispatcher::wrap(int fd) {
+        fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
+        return handle(fd, *this);
+    }
+
+    void dispatcher::resume(dispatcher::event_slot& rv, handle::shared* h) {
+        if (rv.events & EPOLLIN)
+            h->in_done.notify();
+
+        if (rv.events & EPOLLOUT)
+            h->out_done.notify();
+    }
+}
