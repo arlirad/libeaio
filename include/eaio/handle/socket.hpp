@@ -5,6 +5,8 @@
 #include <sys/types.h>
 
 namespace eaio {
+    struct accept_result;
+
     class socket : public handle {
         public:
         using handle::handle;

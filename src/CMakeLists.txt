@@ -1,6 +1,7 @@
 add_library(eaio STATIC dispatcher.cpp handle.cpp)
 
 target_sources(eaio PRIVATE
+    handle/signal.cpp
     handle/socket.cpp
 )
 

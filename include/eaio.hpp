@@ -2,6 +2,7 @@
 
 #include <eaio/coro.hpp>
 #include <eaio/handle.hpp>
+#include <eaio/handle/signal.hpp>
 #include <eaio/handle/socket.hpp>
 #include <sys/epoll.h>
 
