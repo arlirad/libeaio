@@ -3,6 +3,7 @@
 #include <eaio/coro.hpp>
 
 #include <errno.h>
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -40,8 +41,9 @@ namespace eaio {
 
         protected:
         struct shared {
-            dispatcher& _owner;
-            int         _fd = -1;
+            dispatcher&                   _owner;
+            int                           _fd = -1;
+            std::function<void(uint32_t)> _cb;
 
             await_handle<void> in_done;
             await_handle<void> out_done;

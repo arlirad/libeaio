@@ -167,7 +167,7 @@ namespace eaio {
                 return {std::coroutine_handle<promise_type>::from_promise(*this)};
             }
 
-            std::suspend_never initial_suspend() noexcept {
+            std::suspend_always initial_suspend() noexcept {
                 return {};
             }
 

@@ -41,6 +41,11 @@ namespace eaio {
             epoll_event& event = this->_events[i];
             auto         sh    = reinterpret_cast<handle::shared*>(event.data.ptr);
 
+            if (sh->_cb) {
+                sh->_cb(event.events);
+                continue;
+            }
+
             this->resume(event, sh);
         }
 
@@ -55,10 +60,10 @@ namespace eaio {
     }
 
     void dispatcher::resume(dispatcher::event_slot& rv, handle::shared* h) {
-        if (rv.events & EPOLLIN)
+        if (rv.events & FLAG_IN)
             h->in_done.notify();
 
-        if (rv.events & EPOLLOUT)
+        if (rv.events & FLAG_OUT)
             h->out_done.notify();
     }
 }

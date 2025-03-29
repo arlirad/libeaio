@@ -6,9 +6,26 @@
 #include <eaio/handle/socket.hpp>
 #include <sys/epoll.h>
 
+#include <functional>
 #include <vector>
 
 namespace eaio {
+    constexpr auto FLAG_IN  = ::EPOLLIN;
+    constexpr auto FLAG_OUT = ::EPOLLOUT;
+    constexpr auto FLAG_ERR = ::EPOLLERR;
+
+    class custom : public handle {
+        public:
+        using handle::handle;
+
+        custom(int fd, dispatcher& o, std::function<void(uint32_t)> cb) : handle(fd, o) {
+            this->_shared->_cb = cb;
+        }
+
+        io_result read()  = delete;
+        io_result write() = delete;
+    };
+
     class dispatcher {
         public:
         static const int MAX_EVENTS = 32;
@@ -21,13 +38,18 @@ namespace eaio {
 
         template <typename T, typename... U>
         void spawn(T&& f, U&&... args) {
-            call_def(f, args...);
+            call_def(f, args...).handle.resume();
         }
 
         template <typename T>
         T wrap(int fd) {
             this->prepare_fd(fd);
             return T(fd, *this);
+        }
+
+        custom wrap(int fd, std::function<void(uint32_t)> fun) {
+            this->prepare_fd(fd);
+            return custom(fd, *this, fun);
         }
 
         void poll();
