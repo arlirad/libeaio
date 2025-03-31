@@ -22,6 +22,8 @@ namespace eaio {
         io_result           listen(int backlog);
         coro<accept_result> accept();
 
+        int shutdown(int how);
+
         template <typename T>
         io_result bind(const T& addr) {
             return this->bind(reinterpret_cast<const sockaddr*>(&addr), sizeof(addr));

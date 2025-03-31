@@ -39,6 +39,8 @@ namespace eaio {
         coro<io_result> write(const char* buffer, size_t count);
         coro<io_result> write(const void* buffer, size_t count);
 
+        int close();
+
         protected:
         struct shared {
             dispatcher&                   _owner;

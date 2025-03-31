@@ -32,12 +32,16 @@ namespace eaio {
         co_return co_await wait(this->_shared->out_done, ::write, this->_fd, buffer, count);
     }
 
+    int handle::close() {
+        return ::close(this->_fd);
+    }
+
     handle::shared::shared(int fd, dispatcher& o) : _fd(fd), _owner(o) {
         o.add(this->_fd, this);
     }
 
     handle::shared::~shared() {
         this->_owner.remove(this->_fd);
-        close(this->_fd);
+        ::close(this->_fd);
     }
 }

@@ -43,6 +43,10 @@ namespace eaio {
         };
     }
 
+    int socket::shutdown(int how) {
+        return ::shutdown(this->_fd, how);
+    }
+
     io_result socket::bind(const sockaddr* addr, socklen_t addrlen) {
         return call(::bind, this->_fd, addr, addrlen);
     }
