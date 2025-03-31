@@ -12,5 +12,6 @@ namespace eaio {
         ssize_t tellg();
         ssize_t seekg(off_t offset);
         ssize_t size();
+        int     truncate(size_t length);
     };
 }
