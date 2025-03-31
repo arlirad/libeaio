@@ -10,11 +10,11 @@ namespace eaio {
     }
 
     coro<io_result> socket::send(const char* buffer, size_t count) {
-        co_return co_await wait(this->_shared->in_done, ::send, this->_fd, buffer, count, 0);
+        co_return co_await wait(this->_shared->out_done, ::send, this->_fd, buffer, count, 0);
     }
 
     coro<io_result> socket::send(const void* buffer, size_t count) {
-        co_return co_await wait(this->_shared->in_done, ::send, this->_fd, buffer, count, 0);
+        co_return co_await wait(this->_shared->out_done, ::send, this->_fd, buffer, count, 0);
     }
 
     coro<io_result> socket::recv(char* buffer, size_t count) {

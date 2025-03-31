@@ -25,11 +25,11 @@ namespace eaio {
     }
 
     coro<io_result> handle::write(const char* buffer, size_t count) {
-        co_return co_await wait(this->_shared->in_done, ::write, this->_fd, buffer, count);
+        co_return co_await wait(this->_shared->out_done, ::write, this->_fd, buffer, count);
     }
 
     coro<io_result> handle::write(const void* buffer, size_t count) {
-        co_return co_await wait(this->_shared->in_done, ::write, this->_fd, buffer, count);
+        co_return co_await wait(this->_shared->out_done, ::write, this->_fd, buffer, count);
     }
 
     handle::shared::shared(int fd, dispatcher& o) : _fd(fd), _owner(o) {
