@@ -30,7 +30,11 @@ namespace eaio {
         handle();
         ~handle();
 
-        constexpr bool is_valid() {
+        constexpr int native_handle() const {
+            return this->_fd;
+        }
+
+        constexpr bool is_valid() const {
             return this->_fd != -1;
         }
 
