@@ -13,6 +13,10 @@ namespace eaio {
         return ::lseek(this->_fd, offset, SEEK_SET);
     }
 
+    ssize_t file::seekg(off_t offset, int whence) {
+        return ::lseek(this->_fd, offset, whence);
+    }
+
     ssize_t file::size() {
         off_t   current = this->tellg();
         ssize_t size    = ::lseek(this->_fd, 0, SEEK_END);
