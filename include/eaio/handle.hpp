@@ -27,6 +27,19 @@ namespace eaio {
 
     class handle {
         public:
+        struct shared {
+            dispatcher&                   _owner;
+            int                           _fd = -1;
+            std::function<void(uint32_t)> _cb;
+
+            await_handle<void> in_done;
+            await_handle<void> out_done;
+            await_handle<void> errored;
+
+            shared(int fd, dispatcher& o);
+            ~shared();
+        };
+
         handle();
         ~handle();
 
@@ -46,19 +59,6 @@ namespace eaio {
         int close();
 
         protected:
-        struct shared {
-            dispatcher&                   _owner;
-            int                           _fd = -1;
-            std::function<void(uint32_t)> _cb;
-
-            await_handle<void> in_done;
-            await_handle<void> out_done;
-            await_handle<void> errored;
-
-            shared(int fd, dispatcher& o);
-            ~shared();
-        };
-
         std::shared_ptr<shared> _shared;
         int                     _fd;
 

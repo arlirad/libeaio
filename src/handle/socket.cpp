@@ -10,19 +10,23 @@ namespace eaio {
     }
 
     coro<io_result> socket::send(const char* buffer, size_t count) {
-        co_return co_await wait(this->_shared->out_done, ::send, this->_fd, buffer, count, 0);
+        co_return co_await wait(this->_shared->_owner, this->_shared->out_done, ::send, this->_fd,
+                                buffer, count, 0);
     }
 
     coro<io_result> socket::send(const void* buffer, size_t count) {
-        co_return co_await wait(this->_shared->out_done, ::send, this->_fd, buffer, count, 0);
+        co_return co_await wait(this->_shared->_owner, this->_shared->out_done, ::send, this->_fd,
+                                buffer, count, 0);
     }
 
     coro<io_result> socket::recv(char* buffer, size_t count) {
-        co_return co_await wait(this->_shared->in_done, ::recv, this->_fd, buffer, count, 0);
+        co_return co_await wait(this->_shared->_owner, this->_shared->in_done, ::recv, this->_fd,
+                                buffer, count, 0);
     }
 
     coro<io_result> socket::recv(void* buffer, size_t count) {
-        co_return co_await wait(this->_shared->in_done, ::recv, this->_fd, buffer, count, 0);
+        co_return co_await wait(this->_shared->_owner, this->_shared->in_done, ::recv, this->_fd,
+                                buffer, count, 0);
     }
 
     io_result socket::listen(int backlog) {
@@ -30,7 +34,8 @@ namespace eaio {
     }
 
     coro<accept_result> socket::accept() {
-        auto result = co_await wait(this->_shared->in_done, ::accept, this->_fd, nullptr, nullptr);
+        auto result = co_await wait(this->_shared->_owner, this->_shared->in_done, ::accept,
+                                    this->_fd, nullptr, nullptr);
 
         if (!result) {
             co_return accept_result{

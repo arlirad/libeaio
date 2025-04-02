@@ -35,6 +35,11 @@ namespace eaio {
     }
 
     void dispatcher::poll() {
+        for (auto resting : this->_resters)
+            resting.resume();
+
+        this->_resters.clear();
+
         int nfds = epoll_wait(this->_fd, this->_events, this->MAX_EVENTS, -1);
 
         for (int i = 0; i < nfds; i++) {

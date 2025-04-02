@@ -7,6 +7,7 @@
 #include <eaio/handle/socket.hpp>
 #include <sys/epoll.h>
 
+#include <atomic>
 #include <functional>
 #include <vector>
 
@@ -29,7 +30,26 @@ namespace eaio {
 
     class dispatcher {
         public:
-        static const int MAX_EVENTS = 32;
+        struct rester {
+            dispatcher& owner;
+
+            rester(dispatcher& d) : owner(d) {}
+
+            bool await_ready() {
+                return false;
+            }
+
+            void await_suspend(std::coroutine_handle<> caller) {
+                owner._resters.push_back(caller);
+            }
+
+            void await_resume() {}
+        };
+
+        static const int MAX_EVENTS    = 32;
+        static const int REST_INTERVAL = 256;
+        std::atomic<int> suspend_counter;
+        rester           event_loop_rest = {*this};
 
         dispatcher();
         ~dispatcher();
@@ -61,6 +81,7 @@ namespace eaio {
         int                                  _fd;
         event_slot                           _events[MAX_EVENTS];
         std::vector<std::coroutine_handle<>> _to_cleanup;
+        std::vector<std::coroutine_handle<>> _resters;
 
         template <typename T, typename... U>
         coro<background> call_def(T&& f, U&&... args) {

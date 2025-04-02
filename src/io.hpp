@@ -1,3 +1,4 @@
+#include "eaio.hpp"
 #include "eaio/coro.hpp"
 #include "eaio/handle.hpp"
 
@@ -17,8 +18,12 @@ namespace eaio {
     }
 
     template <typename F, typename... Args>
-    coro<io_result> wait(await_handle<void>& on_what, F&& func, Args... args) {
+    coro<io_result> wait(dispatcher& d, await_handle<void>& on_what, F&& func, Args... args) {
         while (true) {
+            // otherwise we risk a stack overflow
+            if (d.suspend_counter++ % dispatcher::REST_INTERVAL == dispatcher::REST_INTERVAL - 1)
+                co_await d.event_loop_rest;
+
             auto ret = func(args...);
 
             if (ret < 0 && (errno == EWOULDBLOCK || errno == EAGAIN)) {
