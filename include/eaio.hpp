@@ -46,10 +46,10 @@ namespace eaio {
             void await_resume() {}
         };
 
-        static const int MAX_EVENTS    = 32;
-        static const int REST_INTERVAL = 256;
-        std::atomic<int> suspend_counter;
-        rester           event_loop_rest = {*this};
+        static const int      MAX_EVENTS    = 128;
+        static const uint32_t REST_INTERVAL = 1024;
+        std::atomic<uint32_t> suspend_counter;
+        rester                event_loop_rest = {*this};
 
         dispatcher();
         ~dispatcher();
