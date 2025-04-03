@@ -7,22 +7,22 @@
 namespace eaio {
     struct background;
 
+    struct final_awaiter {
+        bool await_ready() noexcept {
+            return false;
+        }
+
+        template <typename U>
+        void await_suspend(std::coroutine_handle<U> caller) noexcept {
+            if (caller.promise().next)
+                caller.promise().next.resume();
+        }
+
+        void await_resume() noexcept {}
+    };
+
     template <typename T>
     struct coro {
-        struct final_awaiter {
-            bool await_ready() noexcept {
-                return false;
-            }
-
-            template <typename U>
-            void await_suspend(std::coroutine_handle<U> caller) noexcept {
-                if (caller.promise().next)
-                    caller.promise().next.resume();
-            }
-
-            void await_resume() noexcept {}
-        };
-
         struct promise_type {
             T                       value;
             std::coroutine_handle<> next;
@@ -86,19 +86,6 @@ namespace eaio {
 
     template <>
     struct coro<void> {
-        struct final_awaiter {
-            bool await_ready() noexcept {
-                return false;
-            }
-
-            template <typename U>
-            auto await_suspend(std::coroutine_handle<U> caller) noexcept {
-                return caller.promise().next;
-            }
-
-            void await_resume() noexcept {}
-        };
-
         struct promise_type {
             std::coroutine_handle<> next;
             bool                    done = false;
@@ -152,13 +139,13 @@ namespace eaio {
 
     template <>
     struct coro<background> {
-        struct final_awaiter {
+        struct background_final_awaiter {
             bool await_ready() noexcept {
                 return false;
             }
 
             template <typename U>
-            auto await_suspend(std::coroutine_handle<U> caller) noexcept {}
+            void await_suspend(std::coroutine_handle<U> caller) noexcept {}
 
             void await_resume() noexcept {}
         };
@@ -172,7 +159,7 @@ namespace eaio {
                 return {};
             }
 
-            final_awaiter final_suspend() noexcept {
+            background_final_awaiter final_suspend() noexcept {
                 return {};
             }
 
