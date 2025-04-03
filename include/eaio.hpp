@@ -82,6 +82,7 @@ namespace eaio {
         event_slot                           _events[MAX_EVENTS];
         std::vector<std::coroutine_handle<>> _to_cleanup;
         std::vector<std::coroutine_handle<>> _resters;
+        std::vector<std::coroutine_handle<>> _resters_iterated;
 
         template <typename T, typename... U>
         coro<background> call_def(T&& f, U&&... args) {

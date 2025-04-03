@@ -15,7 +15,7 @@ namespace eaio {
     void dispatcher::add(int fd, handle::shared* h) {
         epoll_event ev;
 
-        ev.events   = EPOLLIN;
+        ev.events   = EPOLLIN | EPOLLOUT | EPOLLET;
         ev.data.fd  = h->_fd;
         ev.data.ptr = reinterpret_cast<void*>(h);
 
@@ -25,7 +25,7 @@ namespace eaio {
     void dispatcher::remove(int fd) {
         epoll_event ev;
 
-        ev.events   = EPOLLIN;
+        ev.events   = EPOLLIN | EPOLLOUT | EPOLLET;
         ev.data.fd  = fd;
         ev.data.ptr = nullptr;
 
@@ -35,10 +35,15 @@ namespace eaio {
     }
 
     void dispatcher::poll() {
-        for (auto resting : this->_resters)
-            resting.resume();
-
+        this->_resters_iterated = this->_resters;
         this->_resters.clear();
+
+        for (auto& rester : _resters_iterated) {
+            if (!rester)
+                continue;
+
+            rester.resume();
+        }
 
         int nfds = epoll_wait(this->_fd, this->_events, this->MAX_EVENTS, -1);
 
@@ -54,8 +59,12 @@ namespace eaio {
             this->resume(event, sh);
         }
 
-        for (auto handle : this->_to_cleanup)
+        for (auto handle : this->_to_cleanup) {
+            if (!handle.done())
+                handle.resume();
+
             handle.destroy();
+        }
 
         this->_to_cleanup.clear();
     }
